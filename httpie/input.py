@@ -201,8 +201,12 @@ class Parser(ArgumentParser):
         """
         url = urlsplit(self.args.url)
 
+        password_from_env = os.getenv("HTTPIE_PASSWORD")
+
         if self.args.auth:
-            if not self.args.auth.has_password():
+            if password_from_env:
+                self.args.auth.value = password_from_env
+            elif not self.args.auth.has_password():
                 # Stdin already read (if not a tty) so it's save to prompt.
                 if self.args.ignore_stdin:
                     self.error('Unable to prompt for passwords because'
