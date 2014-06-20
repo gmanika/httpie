@@ -204,14 +204,15 @@ class Parser(ArgumentParser):
         password_from_env = os.getenv("HTTPIE_PASSWORD")
 
         if self.args.auth:
-            if password_from_env:
-                self.args.auth.value = password_from_env
-            elif not self.args.auth.has_password():
+            if not self.args.auth.has_password():
+                if password_from_env:
+                    self.args.auth.value = password_from_env
                 # Stdin already read (if not a tty) so it's save to prompt.
-                if self.args.ignore_stdin:
+                elif self.args.ignore_stdin:
                     self.error('Unable to prompt for passwords because'
                                ' --ignore-stdin is set.')
-                self.args.auth.prompt_password(url.netloc)
+                else:
+                    self.args.auth.prompt_password(url.netloc)
 
         elif url.username is not None:
             # Handle http://username:password@hostname/
